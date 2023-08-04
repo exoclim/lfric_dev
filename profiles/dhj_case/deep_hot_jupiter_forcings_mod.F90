@@ -1,19 +1,3 @@
-!-----------------------------------------------------------------------------
-! (c) Crown copyright 2022 Met Office. All rights reserved.
-! The file LICENCE, distributed with this code, contains details of the terms
-! under which the code may be used.
-!-----------------------------------------------------------------------------
-!> @brief Contains forcing terms for use in the deep hot Jupiter kernels.
-!>
-!> @details Support functions for a kernel that adds the HD209458b test
-!!          based on Menou & Rauscher (2009),
-!!          Atmospheric Circulation of Hot Jupiters: A Shallow Three-Dimensional Model,
-!!          ApJ, 700, 887-897, 2009, DOI: 10.1088/0004-637X/700/1/887.
-!!          Also performed in Mayne et al., (2014),
-!!          Using the UM dynamical cores to reproduce idealised 3-D flows,
-!!          Geoscientific Model Development, Volume 7, Issue 6, 2014, pp. 3059-3087,
-!!          DOI: 10.5194/gmd-7-3059-2014.
-
 module deep_hot_jupiter_forcings_mod
 
   use constants_mod,     only: i_def, r_def, pi
@@ -30,11 +14,6 @@ module deep_hot_jupiter_forcings_mod
 
 contains
 
-!> @brief Function to calculate equilibrium theta profile for deep hot Jupiter temperature forcing.
-!> @param[in] exner         Exner pressure
-!> @param[in] lat           Latitude
-!> @param[in] lon           Longitude
-!> @return    theta_eq      Equilibrium theta
 function deep_hot_jupiter_equilibrium_theta(exner, lat, lon) result(theta_eq)
 
   implicit none
@@ -65,9 +44,6 @@ function deep_hot_jupiter_equilibrium_theta(exner, lat, lon) result(theta_eq)
 
 end function deep_hot_jupiter_equilibrium_theta
 
-!> @brief Function to calculate the Newton relaxation frequency for deep hot Jupiter idealised test case.
-!> @param[in] exner                       Exner pressure
-!> @return    jupiter_like_frequency      Newton cooling relaxation frequency
 function deep_hot_jupiter_newton_frequency(exner) result(jupiter_like_frequency)
 
   implicit none
@@ -107,9 +83,6 @@ function deep_hot_jupiter_newton_frequency(exner) result(jupiter_like_frequency)
  
 end function deep_hot_jupiter_newton_frequency
 
-!> @brief Function to calculate the day side temperature model variable
-!> @param[in] exner         Exner pressure
-!> @return    t_day         Day side temperature model variable
 function day_side_temp(exner) result(t_day)
 
    implicit none
@@ -158,9 +131,6 @@ function day_side_temp(exner) result(t_day)
    
 end function day_side_temp
 
-!> @brief Function to calculate the night side temperature model variable
-!> @param[in] exner         Exner pressure
-!> @return    t_night       Night side temperature model variable
 function night_side_temp(exner) result(t_night)
 
    implicit none
@@ -209,9 +179,6 @@ function night_side_temp(exner) result(t_night)
 
 end function night_side_temp
  
-!> @brief Function to calculate pressure from exner function
-!> @param[in] exner         Exner pressure
-!> @return    pressure      Pressure
 function pressure_from_exner(exner) result(pressure)
 
   implicit none
