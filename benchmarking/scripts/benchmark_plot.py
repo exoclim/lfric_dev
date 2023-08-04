@@ -24,7 +24,7 @@ def timer_file_to_dataframe(timer_file_path):
     return df
 
 
-def generate_most_expensive_cost_plot(timer_file_path, output_file_name):
+def generate_most_expensive_cost_plot(timer_file_path, output_file_name, plot_label):
     """This method generates a plot of the top 15 most costly routine
     calls as a histogram plot."""
 
@@ -56,10 +56,14 @@ def generate_most_expensive_cost_plot(timer_file_path, output_file_name):
     ax.grid(visible=True, color="grey", linestyle="-.", linewidth=0.5, alpha=0.2)
 
     # Add Plot Title
-    ax.set_title("Mean time (s)", loc="left")
+    title = "Mean time (s) for " + plot_label
+    ax.set_title(title, loc="left")
 
     # Save plot to file
     plt.savefig(output_file_name + ".png")
+
+    # Close the plot
+    plt.close()
 
 
 if __name__ == "__main__":
@@ -67,11 +71,19 @@ if __name__ == "__main__":
     15 most costly routine calls as a histogram plot."""
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("timer_file_path", help="Path to config timings map file")
-    parser.add_argument("output_file_name", help="Path to config timings map file")
+    parser.add_argument("config_map_path", help="Path to config timings map file")
     args = parser.parse_args()
 
-    generate_most_expensive_cost_plot(
-        timer_file_path=Path(args.timer_file_path),
-        output_file_name=args.output_file_name,
-    )
+    with open(Path(args.config_map_path)) as file:
+        config_map = json.load(file)
+
+    i = 0
+    for config in config_map:
+        i = i + 1
+        timer_file_path = config_map[config]
+        image_file_name = "benchmark_plot_" + str(i)
+        generate_most_expensive_cost_plot(
+            timer_file_path=Path(timer_file_path),
+            output_file_name=image_file_name,
+            plot_label = config
+        )
