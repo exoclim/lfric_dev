@@ -1,3 +1,8 @@
+"""
+This script reads in a LFRic benchmarking timer file and plots the top
+most costly routine calls as a histogram plot.
+"""
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
@@ -7,8 +12,20 @@ from pathlib import Path
 from io import StringIO
 
 
-def timer_file_to_dataframe(timer_file_path):
-    """This method read in a LFRic timer file into a pandas data frame"""
+def timer_file_to_dataframe(timer_file_path: str) -> pd.DataFrame:
+    """
+    This function reads in a LFRic timer file into a pandas data frame
+
+    Parameters
+    ----------
+    timer_file_path : str
+        Path to LFRic timer file
+
+    Returns
+    -------
+    pd.Dataframe :
+        A pandas dataframe containing LFRic timer file data
+    """
 
     with open(timer_file_path, "r") as file:
         data = file.read()
@@ -24,9 +41,26 @@ def timer_file_to_dataframe(timer_file_path):
     return df
 
 
-def generate_most_expensive_cost_plot(timer_file_path, output_file_name, plot_label):
-    """This method generates a plot of the top 15 most costly routine
-    calls as a histogram plot."""
+def generate_most_expensive_cost_plot(
+    timer_file_path: str,
+    output_file_name: str,
+    plot_label: str,
+    top_number: int,
+) -> None:
+    """
+    This method creates a histogram plot of the top most costly routine calls.
+
+    Parameters
+    ----------
+    timer_file_path : str
+        Path to LFRic timer file
+    output_file_name : str
+        Path to output file name
+    plot_label : str
+        A plot label for plot title string
+    top_number : int
+        No of most expensive routines to plot.
+    """
 
     # Process the LFRic timer file into a pandas data frame
     df = timer_file_to_dataframe(timer_file_path=timer_file_path)
@@ -34,9 +68,9 @@ def generate_most_expensive_cost_plot(timer_file_path, output_file_name, plot_la
     # Sort the dataframe in descending order of expensive routine calls
     df.sort_values(by=["mean time(s)"], inplace=True, ascending=False)
 
-    # Create a bar chart of the 15 most expensive routine calls
-    routine = df["Routine"].head(15)
-    compute_cost = df["mean time(s)"].head(15)
+    # Create a bar chart of the most expensive routine calls
+    routine = df["Routine"].head(top_number)
+    compute_cost = df["mean time(s)"].head(top_number)
 
     # Figure Size
     fig, ax = plt.subplots(figsize=(16, 9))
@@ -67,23 +101,30 @@ def generate_most_expensive_cost_plot(timer_file_path, output_file_name, plot_la
 
 
 if __name__ == "__main__":
-    """This script reads in a LFRic benchmarking timer file and plots the top
-    15 most costly routine calls as a histogram plot."""
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_map_path", help="Path to config timings map file")
+    parser.add_argument(
+        "config_map_path", help="Path to config timings map file", type=str
+    )
+    parser.add_argument(
+        "-t",
+        "--top_number",
+        help="Number of top most expensive routines to plot",
+        type=int,
+        default=15,
+    )
+
     args = parser.parse_args()
 
     with open(Path(args.config_map_path)) as file:
         config_map = json.load(file)
 
-    i = 0
-    for config in config_map:
-        i = i + 1
+    for count, config in enumerate(config_map):
         timer_file_path = config_map[config]
-        image_file_name = "benchmark_plot_" + str(i)
+        image_file_name = "benchmark_plot_" + str(count)
         generate_most_expensive_cost_plot(
             timer_file_path=Path(timer_file_path),
             output_file_name=image_file_name,
-            plot_label = config
+            plot_label=config,
+            top_number=args.top_number,
         )
