@@ -1,0 +1,6 @@
+{
+    "THAI_HAB1 C48 MPI_RANKS=216 THREADS=1 DT=1200 NSTEP=720": "/Users/eao216/projects/lfric_dirac/eetg_lfric_tools/resources/data/timer_thai-hab1_C48_216_ranks_dt_1200_steps_720.txt",
+    "THAI_HAB1 C192 MPI_RANKS=216 THREADS=1 DT=1200 NSTEP=720": "/Users/eao216/projects/lfric_dirac/eetg_lfric_tools/resources/data/timer_thai-hab1_C192_216_ranks_dt_1200_steps_720.txt",
+    "THAI_HAB1 C192 MPI_RANKS=864 THREADS=1 DT=1200 NSTEP=720": "/Users/eao216/projects/lfric_dirac/eetg_lfric_tools/resources/data/timer_thai-hab1_C192_864_ranks_dt_1200_steps_720.txt",
+    "THAI_HAB1 C192 MPI_RANKS=3456 THREADS=1 DT=1200 NSTEP=720": "/Users/eao216/projects/lfric_dirac/eetg_lfric_tools/resources/data/timer_thai-hab1_C192_3456_ranks_dt_1200_steps_720.txt"
+}
