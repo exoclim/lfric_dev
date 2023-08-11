@@ -94,7 +94,7 @@ def generate_most_expensive_cost_plot(
     ax.set_title(title, loc="left")
 
     # Save plot to file
-    plt.savefig(output_file_name + ".png")
+    fig.savefig(output_file_name + ".png")
 
     # Close the plot
     plt.close()
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
     for count, config in enumerate(config_map):
         timer_file_path = config_map[config]
-        image_file_name = "benchmark_plot_" + str(count)
+        image_file_name = f"benchmark_plot_{count:02d}"
         generate_most_expensive_cost_plot(
             timer_file_path=Path(timer_file_path),
             output_file_name=image_file_name,
