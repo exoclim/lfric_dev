@@ -1,9 +1,9 @@
 ---
 name: "Past Issue"
-about: Document already resolved issue for keeping track of our progress
+about: Already resolved issue for keeping track of our progress
 title: ''
-labels: 'past-issue'
-projects: ['exoclim/3']
+labels: 'past-issues'
+projects: ['exoclim/3',]
 assignees: 'dennissergeev'
 
 ---
