@@ -3,7 +3,7 @@ name: "Past Issue"
 about: Document already resolved issue for keeping track of our progress
 title: ''
 labels: 'past-issue'
-project: exoclim/3
+projects: ['exoclim/3']
 assignees: 'dennissergeev'
 
 ---
