@@ -135,17 +135,19 @@ def cube_in_list(cubelist, cube_name):
     return False
 
 
-def plot_air_pot_temp(air_pot_cube):
+def plot_air_pot_temp(air_pot_cube, debug: bool = False):
     # Plot air temperature
 
-    print(air_pot_cube)
+    if debug:
+        print(air_pot_cube)
     if not air_pot_cube.coord("level_height").has_bounds():
         air_pot_cube.coord("level_height").guess_bounds()
     if not air_pot_cube.coord("time").has_bounds():
         air_pot_cube.coord("time").guess_bounds()
     cube_slice = air_pot_cube[-1].extract(iris.Constraint(level_height=123_456))
 
-    print(cube_slice)
+    if debug:
+        print(cube_slice)
 
     lats = cube_slice.coord("latitude").points
     lons = cube_slice.coord("longitude").points
@@ -170,7 +172,7 @@ def plot_air_pot_temp(air_pot_cube):
     fig.savefig("air_pot_temp.png")
 
 
-def plot_horizontal_wind_vecs(east_cube, north_cube):
+def plot_horizontal_wind_vecs(east_cube, north_cube, debug: bool = False):
     # Make a vector plot of winds
 
     cube_east_slice = isel(east_cube[-1], "level_height", 20)
@@ -179,8 +181,9 @@ def plot_horizontal_wind_vecs(east_cube, north_cube):
     lats = cube_east_slice.coord("latitude").points
     lons = cube_east_slice.coord("longitude").points
 
-    print(cube_east_slice)
-    print(cube_north_slice)
+    if debug:
+        print(cube_east_slice)
+        print(cube_north_slice)
 
     fig, ax = plt.subplots(constrained_layout=True)
     ax.streamplot(
@@ -278,7 +281,7 @@ def plot_isobaric_winds(
     fig.savefig("zonal_wind_isobaric.png")
 
 
-def regrid_cubes(filename):
+def regrid_cubes(filename: str, debug: bool = False):
     # Following the aeolus method of re-gridding cubes to latlon
 
     # This has to be a Path
@@ -303,25 +306,28 @@ def regrid_cubes(filename):
         if cube.name() == "air_pressure" and cube.coords("full_levels"):
             cube.rename("air_pressure_full_levels")
 
-    # Check that we've done that
-    print(cubes_raw)
+    if debug:
+        # Check that we've done that
+        print(cubes_raw)
 
     # Try re-gridding the cubes
     ref_cube = create_dummy_cube(nlat=48, nlon=96, pm180=True)
     #    generate_latlon_cube(10,20)
 
-    print(ref_cube)
+    if debug:
+        print(ref_cube)
 
     # Now re-grid them
     cubes_regr = simple_regrid_lfric(
         cubes_raw, tgt_cube=ref_cube, ref_cube_constr="air_potential_temperature"
     )
 
-    print(cubes_regr)
+    if debug:
+        print(cubes_regr)
 
     # Let's make a simple latlon plot
     if cube_in_list(cubes_regr, "air_potential_temperature"):
-        plot_air_pot_temp(cubes_regr.extract_cube("air_potential_temperature"))
+        plot_air_pot_temp(cubes_regr.extract_cube("air_potential_temperature"), debug)
 
     # Make a wind vector plot
     if cube_in_list(cubes_regr, "eastward_wind") and cube_in_list(
@@ -330,6 +336,7 @@ def regrid_cubes(filename):
         plot_horizontal_wind_vecs(
             cubes_regr.extract_cube("eastward_wind"),
             cubes_regr.extract_cube("northward_wind"),
+            debug=debug,
         )
 
     if cube_in_list(cubes_regr, "eastward_wind"):
@@ -338,6 +345,7 @@ def regrid_cubes(filename):
             plot_isobaric_winds(
                 cubes_regr.extract_cube("eastward_wind"),
                 cubes_regr.extract_cube("air_pressure_full_levels"),
+                debug=debug,
             )
 
 
@@ -348,10 +356,12 @@ def main(
     layer: int = 0,
     norun: bool = False,
     no_regrid: bool = False,
+    debug: bool = False,
 ):
     cubes = load_cubes(filename)
 
-    print(cubes)
+    if debug:
+        print(cubes)
 
     if dump_info:
         dump_cube_info(cubes[0])
@@ -377,7 +387,7 @@ def main(
 
     # Call the re-gridding routine
     if not no_regrid:
-        regrid_cubes(filename)
+        regrid_cubes(filename, debug)
 
 
 if __name__ == "__main__":
@@ -418,9 +428,21 @@ if __name__ == "__main__":
         action="store_true",
         help="Don't run the re-gridding",
     )
+    parser.add_argument(
+        "--debug",
+        default=False,
+        action="store_true",
+        help="Print out debugging information",
+    )
 
     args = parser.parse_args()
 
     main(
-        args.infile, args.dumpinfo, args.timestep, args.layer, args.norun, args.noregrid
+        args.infile,
+        args.dumpinfo,
+        args.timestep,
+        args.layer,
+        args.norun,
+        args.noregrid,
+        args.debug,
     )
