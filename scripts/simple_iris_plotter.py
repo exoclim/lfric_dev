@@ -24,7 +24,7 @@ from aeolus.coord import (
 from aeolus.calc import zonal_mean
 
 
-def load_cubes(filename: str):
+def load_cubes(filename: str) -> iris.cube.CubeList:
     # Load cubes.
     cubes = iris.load(filename)
 
@@ -124,7 +124,7 @@ def generate_latlon_cube(
     return cube
 
 
-def cube_in_list(cubelist, cube_name):
+def cube_in_list(cubelist: iris.cube.CubeList, cube_name: str):
     # Because Iris throws an exception when if can't find a cube by a name, this is
     # a helper to check it's in the list
 
@@ -325,7 +325,13 @@ def regrid_cubes(filename: str, debug: bool = False):
     if debug:
         print(cubes_regr)
 
-    # Let's make a simple latlon plot
+    return cubes_regr
+
+
+def make_regridded_plots(cubes_regr: iris.cube.CubeList, debug: bool = False):
+    # Make plots on re-gridded
+
+    # Make a air potential temperature plot
     if cube_in_list(cubes_regr, "air_potential_temperature"):
         plot_air_pot_temp(cubes_regr.extract_cube("air_potential_temperature"), debug)
 
@@ -339,9 +345,11 @@ def regrid_cubes(filename: str, debug: bool = False):
             debug=debug,
         )
 
+    # Make zonal wind plots
     if cube_in_list(cubes_regr, "eastward_wind"):
         plot_zonal_winds(cubes_regr.extract_cube("eastward_wind"))
         if cube_in_list(cubes_regr, "air_pressure_full_levels"):
+            # Make isobaric zonal wind plot
             plot_isobaric_winds(
                 cubes_regr.extract_cube("eastward_wind"),
                 cubes_regr.extract_cube("air_pressure_full_levels"),
@@ -387,7 +395,8 @@ def main(
 
     # Call the re-gridding routine
     if not no_regrid:
-        regrid_cubes(filename, debug)
+        cubes_regr = regrid_cubes(filename, debug)
+        make_regridded_plots(cubes_regr, debug)
 
 
 if __name__ == "__main__":
