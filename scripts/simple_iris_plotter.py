@@ -226,20 +226,21 @@ def plot_zonal_winds(east_winds_cube):
     fig.savefig("zonal_plot_height.png")
 
 
-def plot_isobaric_winds(eastward_wind_cube, air_pressure_cube):
-    # Attempt to interpolate the data to isobaric
-    print("Attempting to make the isobaric plot")
+def plot_isobaric_winds(
+    eastward_wind_cube,
+    air_pressure_cube,
+    max_pressure=1e5,
+    pressure_res=1e2,
+    debug=False,
+):
+    # Interpolate wind speeds to isobaric
     INTERPOLATOR = partial(
         stratify.stratify.interpolate,
         interpolation=stratify.stratify.INTERPOLATE_LINEAR,
         extrapolation=stratify.stratify.EXTRAPOLATE_LINEAR,
     )
-    lfric.pres = ""
-    (pres_lev := np.arange(1e5, 0, -1e2))
-
-    print(lfric)
-    print(lfric.pres)
-    print(pres_lev)
+    lfric.pres = air_pressure_cube.name()
+    (pres_lev := np.arange(max_pressure, 0, -(pressure_res)))
 
     cube_plev = stratify.relevel(
         eastward_wind_cube,
@@ -248,17 +249,17 @@ def plot_isobaric_winds(eastward_wind_cube, air_pressure_cube):
         axis=lfric.z,
         interpolator=INTERPOLATOR,
     )
-    print(cube_plev)
-    cube_plev.coord("air_pressure_full_levels").attributes = {}
+    cube_plev.coord(air_pressure_cube.name()).attributes = {}
     cube_plev = iris.util.squeeze(cube_plev)
-    print(cube_plev)
+    if debug:
+        print(cube_plev)
 
     u_p_zm = zonal_mean(cube_plev[-1])
 
     fig, ax = plt.subplots(constrained_layout=True)
     p0 = ax.contourf(
         u_p_zm.coord("latitude").points,
-        u_p_zm.coord("air_pressure_full_levels").points,
+        u_p_zm.coord(air_pressure_cube.name()).points,
         u_p_zm.data,
         cmap="RdBu_r",
         norm=mcol.CenteredNorm(),
@@ -266,7 +267,7 @@ def plot_isobaric_winds(eastward_wind_cube, air_pressure_cube):
     cb0 = fig.colorbar(p0, ax=ax)
     cb0.ax.set_ylabel("Wind Speed / $m$ $s^{-1}$")
 
-    ax.set_ylim(1e5, 1e2)
+    ax.set_ylim(max_pressure, pressure_res)
     ax.set_yscale("log")
 
     ax.set_ylabel("Pressure / Pa")
